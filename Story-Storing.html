@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paragraph Search</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    header {
+      background: #333;
+      color: white;
+      padding: 1rem 0;
+      text-align: center;
+    }
+    header input {
+      padding: 0.5rem;
+      width: 60%;
+      border: none;
+      border-radius: 5px;
+      margin-right: 10px;
+    }
+    header button {
+      padding: 0.5rem 1rem;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    header button:hover {
+      background: #0056b3;
+    }
+    main {
+      padding: 1rem;
+    }
+    #results {
+      margin-top: 1rem;
+      background: white;
+      border-radius: 5px;
+      padding: 1rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    .result-item {
+      padding: 0.5rem;
+      border-bottom: 1px solid #ddd;
+      cursor: pointer;
+    }
+    .result-item:hover {
+      background: #f9f9f9;
+    }
+    #displayArea {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: white;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+    #displayArea h2 {
+      margin-top: 0;
+    }
+    #editTextArea {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      height: 200px; /* Increased height for text area */
+      resize: vertical;
+    }
+    #buttons {
+      display: flex;
+      gap: 10px;
+    }
+    #buttons button {
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #editButton {
+      background: #28a745;
+      color: white;
+    }
+    #resetButton {
+      background: #dc3545;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Search Compositions</h1>
+    <input type="text" id="searchInput" placeholder="Search by keywords...">
+    <button id="searchButton">Search</button>
+  </header>
+
+  <main>
+    <div id="results"></div>
+  </main>
+
+  <script>
+    // Array of compositions (at least 100 items for demonstration)
+    const compositions = [
+      { title: "A Winter Morning", text: "A winter morning is a special time that brings a unique beauty to the day. As the sun rises slowly, the world seems covered in a light blanket of fog, giving everything a misty appearance. The cold air is crisp, and people bundle up in warm clothes like sweaters, shawls, and scarves to protect themselves from the chilly weather. The fields and rooftops are often covered with dew, and sometimes a thin layer of glittering frost in the early morning makes the surroundings look very much magical.On a winter morning, the usual hustle and bustle of daily life starts a little later than usual. people prefer to stay warm in their beds for a while longer. The streets are silent, with fewer people outside .Those who come outside are often seen gathering around small fires to keep themselves warm. The smell of burning wood and the sight of people sipping hot tea or pithas (traditional winter snacks) is common.A winter morning is a beautiful time. In a winter morning the fog( কুয়াশা) makes everything look soft and misty. The air is cold, so people wear warm clothes like sweaters, shawls, and scarves. Fields and rooftops sparkle with dew or frost, making the surroundings magical.Life starts a bit later on a winter morning as people stay in their warm beds longer. The streets are quiet, with only a few people outside. Those who come out often gather around small fires to stay warm. The smell of burning wood and the sight of people enjoying hot tea or pithas add to the charm of the morning." },
+      { title: "School Library", text: "The school library is one of my favorite places at school. It is a quiet and peaceful space where students can read, study, and explore new knowledge. Our library has a wide collection of books on various subjects, including textbooks, storybooks, and reference materials. There are books on science, history, literature, and also books for young readers like fairy tales and adventure stories. The library also has magazines, newspapers, and some educational journals, which help us stay updated on current events and discoveries.The librarian is very helpful and always guides us in finding the right books for our studies or interests. The library is well-organized, with shelves neatly arranged, and a comfortable reading area where we can sit and read for hours. There are also tables where we can do our homework or group projects. The calm atmosphere of the library makes it an ideal place for focusing on studies, and it encourages us to develop good reading habits.Our school promotes the use of the library by organizing reading programs and book exhibitions, which help us learn the importance of books in gaining knowledge. Spending time in the library is not only educational but also enjoyable, as it opens up a world of imagination and learning." },
+      { title: "Rickshaw puller", text: "The life of a rickshaw puller is a story of hard work and dedication. These hardworking individuals are the backbone of urban and rural transport, providing an essential service that often goes unappreciated. For many rickshaw pullers, their day begins before dawn and ends at late night. Despite the physical hardship and the low earnings, they continue to pull their rickshaws with a sense of duty and determination. Because they know that their hard work supports their families and contributes to the survival of life.A rickshaw puller's life is not without its challenges. The demands of their work are intense, exposure to bad weather conditions. Yet, many rickshaw pullers accept these hardships with remarkable determination.Their earnings are the main source of income for their families, covering basic necessities like food, shelter, and education for their children. Despite the odds, they cherish hopes and dreams of a better future in their mind. They sacrifice their own comfort to ensure that their children have opportunities that are out of reach for them. As we consider the role of rickshaw pullers in our communities, it is important to recognize their contributions and help them for better working conditions, fair wages, and social support that can help uplift their lives.Finally, As we navigate our own lives, let us take a moment to realize the hard work of rickshaw pullers and extend our sympathy  and support to those who keep our cities moving." },
+      {
+    "title": "A Busy Street",
+    "text": "A busy street is always full of life, with people hurrying to their destinations, cars honking, and street vendors calling out to potential customers. The sound of footsteps, chatter, and the hum of engines creates a constant buzz that fills the air. The sidewalks are crowded with people walking quickly, some talking on their phones while others are lost in thought. The shops lining the street are bustling with activity, with colorful signs and displays tempting passersby. The air smells of fresh food from street carts, and the aroma of coffee and baked goods drifts from nearby cafes. The noise is overwhelming at times, but it has a certain energy that makes the street feel alive. People from all walks of life pass by, some dressed in business attire, others in casual clothes, all moving quickly through the urban landscape. Traffic is a constant challenge, with cars and buses inching along while pedestrians weave through the gaps. Despite the chaos, there is a rhythm to the busy street, a pulse that seems to push everyone forward in the same direction. It’s a place where life feels vibrant, and there’s always something new to see or hear."
+  },
+  {
+    "title": "My Favorite Hobby",
+    "text": "One of my favorite hobbies is reading, as it allows me to escape into different worlds, explore new ideas, and learn about a variety of topics. Whether it’s a thrilling mystery, an inspiring biography, or a science fiction novel, books offer an experience that no other medium can quite replicate. I find solace in the quiet moments spent with a good book, where I can immerse myself fully in the story or the subject matter. Reading provides me with a sense of adventure, even if I am simply sitting in a chair with a cup of tea. I enjoy how a book can challenge my thinking, inspire creativity, or teach me something new. It’s a hobby that I can engage with anywhere—at home, on the train, or in a café—and it never fails to provide me with new perspectives. There’s something special about losing track of time while reading, as the outside world fades away, and I get lost in the pages of a well-crafted story. I also appreciate how reading can bring people together; discussing a favorite book or sharing recommendations creates bonds and enriches relationships."
+  },
+  {
+    "title": "A Rainy Day",
+    "text": "A rainy day has a unique charm that brings a sense of calm and tranquility to the world. The sound of raindrops tapping against windows and the soft rustling of leaves in the breeze create a peaceful atmosphere. The air feels fresh and cool, and the world slows down, as if everything is taking a brief pause. People often carry umbrellas as they walk along the streets, their footsteps softened by the wet ground beneath them. The rain nourishes the earth, making the colors of nature appear more vivid, and the smell of damp soil fills the air. On rainy days, I like to stay indoors with a warm blanket, a cup of tea, and a good book or a movie. There’s something comforting about being inside while the rain falls outside, watching the world through a foggy window. Sometimes, I take a walk in the rain, enjoying the solitude and the rhythm of the droplets as they fall. Despite the inconvenience that rain can cause, I find it to be a beautiful reminder of nature’s power and rhythm, making it a special part of any season."
+  },
+  {
+    "title": "The Park Near My House",
+    "text": "The park near my house is a peaceful retreat that offers a break from the hustle and bustle of everyday life. It’s a small but beautiful green space, with tall trees that provide shade on hot summer days and colorful flowers that bloom in spring. The park is a popular spot for families, joggers, and people walking their dogs. There is a winding path that runs through the park, perfect for a leisurely stroll or a morning run. A large pond sits in the center, with ducks swimming gracefully on the water’s surface. Children often play on the swings and slides, their laughter echoing through the air. On weekends, you can hear people picnicking on the grass, enjoying their lunch as they relax under the shade of the trees. The sound of birds chirping adds to the calming atmosphere, making the park feel like a little oasis of nature amidst the city. I enjoy visiting the park whenever I need to clear my mind or simply want to enjoy some fresh air. It’s the perfect place to unwind and appreciate the beauty of nature."
+  },
+  {
+    "title": "My Best Friend",
+    "text": "My best friend is someone who has always been there for me, through thick and thin. We’ve known each other since childhood, and over the years, our bond has only grown stronger. She has a kind and compassionate nature, always putting others before herself. Whether I’m feeling down or excited, she’s the first person I turn to, and I know she’ll listen without judgment. We share a lot of common interests, from our love of books to our shared sense of humor. What makes our friendship unique is that we can spend hours together without saying much, yet it never feels awkward. There’s a deep understanding between us that allows us to communicate with just a glance. We’ve been through many experiences together, both good and bad, and each one has brought us closer. I value her loyalty and support more than words can express, and I am grateful to have her by my side. She’s not just a friend; she’s like a sister to me, and I can’t imagine my life without her."
+  },
+  {
+    "title": "A Visit to the Zoo",
+    "text": "A visit to the zoo is always an exciting adventure, offering a chance to see animals from all over the world up close. I recently went to the zoo with my family, and it was an experience I’ll never forget. The first stop was the lion’s den, where we marveled at the majesty of the big cats as they lounged in the sun. From there, we walked to the elephant exhibit, where the giant creatures were enjoying a bath. Their size and strength were awe-inspiring, and it was amazing to watch them interact with each other. We also visited the giraffes, whose long necks made them easy to spot from afar, and the monkeys, who entertained us with their playful antics. The zoo has a variety of educational exhibits, where we learned about the animals' natural habitats, behaviors, and conservation efforts. We also took part in a feeding session for the goats and rabbits, which was a fun hands-on experience. Walking through the zoo, I couldn’t help but feel a sense of wonder at the diversity of life on Earth. It was a day filled with laughter, learning, and a deeper appreciation for the animals we share the planet with."
+  },
+  {
+    "title": "A Birthday Party",
+    "text": "A birthday party is always a joyous occasion, filled with laughter, fun, and celebration. Last year, I attended my best friend’s birthday party, and it was an unforgettable experience. The venue was decorated with colorful balloons, streamers, and banners that said ‘Happy Birthday.’ The room was filled with friends and family, all excited to celebrate the special day. We played games like musical chairs, pin the tail on the donkey, and a scavenger hunt, which kept everyone entertained. The highlight of the party was the cake-cutting ceremony, where my friend made a wish before blowing out the candles. The cake was a beautiful chocolate masterpiece, decorated with intricate designs and topped with fresh strawberries. Afterward, everyone sang happy birthday and enjoyed a delicious meal, followed by dancing and more games. It was a day of laughter, joy, and togetherness, a perfect way to mark another year of life. Birthdays are always a reminder of the love and happiness shared among friends and family, and it’s a time to create memories that will last a lifetime."
+  },
+  {
+    "title": "My Favorite Festival",
+    "text": "My favorite festival is Eid, a celebration that marks the end of Ramadan, a month of fasting and reflection. Eid is a time for family, friends, and the community to come together in joy and gratitude. The day begins with a special prayer at the mosque, where everyone gathers to pray and give thanks for the blessings of the past month. Afterward, we visit relatives and friends, exchanging gifts, sweets, and warm wishes. The meals during Eid are always a feast, with dishes that have been carefully prepared and shared among loved ones. I especially look forward to the traditional sweets, like baklava and kunafa, that are enjoyed during the festival. The sense of unity and togetherness is what makes Eid so special. It’s a time to reconnect with loved ones, reflect on the importance of charity and giving, and celebrate the joy of life. Eid brings a sense of renewal and happiness, making it my favorite festival of the year."
+  },
+  {
+    "title": "The Beach",
+    "text": "The beach is one of my favorite places to relax and unwind. There is something incredibly peaceful about the sound of waves crashing against the shore and the feeling of sand between your toes. I love visiting the beach during the summer, when the sun is warm and the water is refreshing. The beach offers endless activities, whether it’s swimming in the ocean, playing beach volleyball, or simply lying on a towel with a good book. The sight of the vast blue sky meeting the horizon is always breathtaking, and the salty sea breeze fills the air with freshness. I enjoy walking along the shoreline, collecting seashells and watching the seagulls soar overhead. In the evenings, the beach becomes even more magical as the sun sets, casting vibrant colors across the sky. The beach is a place to connect with nature, enjoy the outdoors, and spend time with friends and family. It’s a destination that brings peace, relaxation, and a sense of adventure."
+  },
+  {
+    "title": "A Day at the Market",
+    "text": "A day at the market is always a vibrant and lively experience. The air is filled with the smell of fresh fruits, vegetables, spices, and street food. As soon as you step into the market, you are greeted by colorful stalls displaying an array of goods, from bright red tomatoes to freshly baked bread and handmade crafts. The sounds of vendors calling out their prices and bargaining with customers create a constant hum of activity. There is a sense of energy that fills the space as people haggle for the best deals and shop for the essentials. I particularly enjoy the variety of fresh produce available, as well as the specialty items that reflect the local culture. Whether it's a handmade scarf or a jar of homemade jam, the market is a place to discover something unique. The atmosphere is warm and welcoming, with everyone from young children to elderly shoppers strolling through, enjoying the lively ambiance. It’s a place where you can connect with the community, find fresh food, and experience the heart of local life."
+  },
+  {
+    "title": "A Village Scene",
+    "text": "A village scene is a peaceful and serene view of rural life, where nature and simplicity blend together. In the mornings, the sun rises over the fields, casting a soft golden light over the small cottages and the surrounding greenery. The sound of birds singing fills the air as the village slowly comes to life. Farmers walk along narrow dirt paths, carrying baskets of fresh produce or guiding their livestock to the fields. The scent of freshly baked bread wafts from the bakery, and the village square is often a gathering place for locals, exchanging news and stories. The houses are simple but charming, with flower pots hanging from windowsills and vegetable gardens growing in the backyards. Children play in the open fields, running barefoot through the grass, while adults tend to their chores or relax in the shade of a tree. Life in the village moves at a slower pace, with the emphasis on community, nature, and the simple pleasures of life. The village scene is a reminder of the beauty and tranquility that can be found in rural living."
+  },
+  {
+    "title": "My School",
+    "text": "My school is a place where I not only learn new things but also build lasting memories with my friends and teachers. The campus is surrounded by large trees, and the classrooms are spacious and well-lit, making it a comfortable environment for studying. I particularly enjoy the variety of subjects we study, from mathematics and science to literature and history. Each subject offers its own challenges, and I appreciate how the teachers make learning interesting and engaging. The school has a well-equipped library, which is my favorite spot for reading and doing research. During recess, I like to meet up with my friends in the playground, where we play sports, chat, or simply relax in the shade. The school also has extracurricular activities, like art and music clubs, where I can explore my creative side. My school has taught me not just academic lessons but also the importance of discipline, teamwork, and kindness. It’s a place where I feel inspired to learn and grow, and I’m grateful for the friendships I’ve made and the opportunities it provides."
+  },
+  {
+    "title": "My Daily Life",
+    "text": "My daily life is a blend of routine and spontaneity, balancing responsibilities and moments of relaxation. Every morning, I wake up early to start my day with a cup of tea and a quiet moment of reflection before getting ready for the day ahead. After breakfast, I either go to work or attend school, depending on the day. My work or studies usually take up the majority of my time, but I make sure to take breaks throughout the day to recharge. In the evenings, I like to unwind by reading a book, listening to music, or spending time with family and friends. I also try to incorporate exercise into my daily routine, whether it’s a walk in the park or a workout at the gym. Before bed, I reflect on the day and make plans for the next. While my days are often busy, I try to find balance and make time for the things that bring me peace and joy. Overall, my daily life is a mix of productivity and relaxation, with a focus on both personal and professional growth."
+  },
+  {
+    "title": "My Favourite Book",
+    "text": "One of my favorite books is *To Kill a Mockingbird* by Harper Lee. This timeless novel explores themes of justice, racial inequality, and moral growth through the eyes of Scout Finch, a young girl in the American South during the 1930s. The story is both heart-wrenching and inspiring, as it challenges societal norms and encourages readers to reflect on their own values. The character of Atticus Finch, Scout's father, stands as a beacon of integrity and wisdom, teaching his children important lessons about empathy and standing up for what is right, even when it is difficult. The book is beautifully written, with vivid descriptions and rich dialogue that bring the setting and characters to life. What I appreciate most about *To Kill a Mockingbird* is its ability to spark conversations about race, justice, and human nature. It is a book that stays with you long after you finish reading, leaving you with a sense of both sadness and hope. It’s a novel that resonates deeply, making it a treasured part of my reading collection."
+  },
+  {
+    "title": "Independence Day of Bangladesh",
+    "text": "Independence Day of Bangladesh, celebrated on March 26th, marks a significant moment in the country's history, commemorating its declaration of independence from Pakistan in 1971. The day is observed with great pride and reverence, as it honors the sacrifices made by millions who fought for the nation's freedom. Early in the morning, the national flag is raised at government buildings, schools, and homes, symbolizing the strength and resilience of the Bangladeshi people. Many people participate in parades, while cultural programs featuring music, dance, and poetry are held across the country. The day is also marked by reflection, as citizens remember the struggles of the Liberation War and the efforts of the freedom fighters. For many, Independence Day is not just a celebration of the nation’s independence but also a reminder of the ongoing journey toward progress and unity. The day instills a deep sense of patriotism and pride, as people come together to honor their country’s history and its future."
+  },
+  {
+    "title": "A Good Friend",
+    "text": "A good friend is someone who stands by your side through thick and thin, offering support, encouragement, and understanding. My best friend is always there to listen when I need to talk, and she knows just how to make me laugh when I’m feeling down. A good friend is not just someone to spend time with but someone who helps you grow as a person. They challenge you to be better, offer constructive criticism, and celebrate your successes with genuine happiness. What makes a good friend special is their loyalty and trustworthiness. I know that no matter what happens, I can rely on my friend to be there for me. Whether we’re sharing our dreams or dealing with difficult times, a good friend makes life brighter and more meaningful. Our friendship is built on mutual respect, kindness, and a deep connection that I value more than words can express. A good friend is truly a treasure, and I’m grateful to have one in my life."
+  },
+  {
+    "title": "Gardening",
+    "text": "Gardening is a relaxing and rewarding hobby that allows me to connect with nature and nurture life. I started gardening a few years ago, and since then, it has become a calming escape from the stress of daily life. Whether it's planting flowers, vegetables, or herbs, there is a sense of satisfaction in watching something grow from a tiny seed into a full plant. Gardening teaches patience, as plants require time, attention, and care to thrive. I enjoy the process of planning what to plant, preparing the soil, and watering the plants regularly. There’s a special joy in harvesting the fruits of your labor, especially when they are fresh and homegrown. In addition to providing beauty and food, gardening has a positive impact on my mental health, helping me relax and focus on the present moment. It’s a hobby that not only benefits me but also contributes to a greener, healthier environment. I look forward to spending time in my garden and seeing how it grows with each passing season."
+  },
+  {
+    "title": "Covid-19",
+    "text": "The Covid-19 pandemic, which began in 2019, has changed the world in ways we never could have anticipated. The global health crisis affected millions of people, causing widespread illness, loss of life, and economic challenges. For many, the pandemic brought feelings of fear, uncertainty, and isolation, as lockdowns and restrictions kept people apart and disrupted daily routines. However, it also brought communities together in new ways, with people supporting each other through online connections, acts of kindness, and collective efforts to stay safe. The pandemic highlighted the importance of public health measures, such as wearing masks, social distancing, and hand hygiene, in preventing the spread of the virus. It also accelerated advancements in technology, as remote work, online learning, and telemedicine became essential. While the pandemic posed numerous challenges, it also sparked resilience and innovation, as scientists and healthcare workers worked tirelessly to develop vaccines and treatments. Covid-19 taught us the value of health, community, and adaptability in the face of adversity."
+  },
+  {
+    "title": "Physical Exercise",
+    "text": "Physical exercise is an essential part of maintaining a healthy lifestyle, offering numerous benefits for both the body and mind. Regular exercise helps to strengthen muscles, improve cardiovascular health, and increase flexibility. Whether it’s jogging, cycling, yoga, or strength training, each form of exercise has its own unique advantages. Personally, I enjoy a mix of activities, such as walking in the park, doing home workouts, and practicing yoga. Exercise not only improves physical fitness but also helps to reduce stress, boost mood, and increase energy levels. When we exercise, our bodies release endorphins, often referred to as ‘feel-good hormones,’ which enhance mental well-being. Furthermore, physical activity plays a crucial role in weight management, helping to prevent various chronic illnesses like diabetes and heart disease. It also promotes better sleep, strengthens the immune system, and helps to improve overall longevity. Incorporating regular physical exercise into daily life is one of the best ways to improve both physical health and mental clarity."
+  },
+  {
+    "title": "A Picnic Experience",
+    "text": "A picnic is a wonderful way to enjoy the outdoors, relax, and spend time with loved ones. I had a memorable picnic experience last summer at a local park, where the weather was perfect—sunny but not too hot. We packed a basket with sandwiches, fruits, snacks, and refreshing drinks, and laid out a blanket on the grass under the shade of a tree. The atmosphere was peaceful, with birds chirping and the sound of children laughing in the distance. We spent hours chatting, playing games, and enjoying the delicious food. One of the highlights was a fun game of frisbee, where everyone participated, and there was plenty of laughter as we tried to catch the flying disc. Afterward, we took a leisurely walk around the park, enjoying the beauty of nature and the company of friends. The best part of the picnic was the sense of relaxation and joy that came from simply being outdoors, away from the stresses of daily life. It was a day filled with good food, great conversation, and beautiful memories."
+  },
+  {
+    "title": "How to Arrange a Picnic",
+    "text": "Arranging a picnic is a fun and simple way to enjoy a day outdoors with friends or family. The first step in organizing a picnic is choosing a location—ideally, a park, beach, or any scenic spot where you can spread out a blanket and enjoy nature. Next, you’ll need to plan the food and drinks. It’s important to pack easy-to-eat items such as sandwiches, salads, fruits, and snacks. Don’t forget to bring plenty of water and perhaps some refreshing beverages like lemonade or iced tea. A cooler or insulated bag is ideal for keeping drinks and perishables cold. You’ll also want to pack some utensils, napkins, and a trash bag to clean up afterward. For entertainment, consider bringing games like frisbees, a ball, or a deck of cards. To make the picnic more comfortable, you can bring a cozy blanket or portable chairs. Don’t forget sunscreen, hats, and sunglasses to protect yourself from the sun. Lastly, make sure to check the weather forecast before heading out to ensure a pleasant experience. With careful preparation, a picnic can be a delightful way to spend a day enjoying food, fun, and nature."
+  },
+  {
+    "title": "Padma Bridge",
+    "text": "The Padma Bridge is a remarkable feat of engineering and a symbol of national pride for Bangladesh. This iconic bridge spans the Padma River, connecting the southwestern part of the country with the capital, Dhaka, and other regions. The project, which took over a decade to complete, is one of the largest infrastructure developments in Bangladesh’s history. The bridge is not just a physical structure; it represents the country's economic growth and its determination to overcome challenges. With a total length of 6.15 kilometers, it is designed to support both road and rail traffic, making it a vital link for transportation, trade, and connectivity. The completion of the Padma Bridge has significantly reduced travel time between different regions, making transportation of goods and people much faster and more efficient. It also holds a significant cultural and symbolic value, showcasing Bangladesh’s ability to execute large-scale projects despite the obstacles it faced. The Padma Bridge is a testament to the country’s ambition to modernize and create a better future for its citizens."
+  },
+  {
+    "title": "FIFA World Cup 2022",
+    "text": "The FIFA World Cup 2022 was a historic tournament, both for the stunning football matches and for being the first World Cup held in the Middle East. Hosted in Qatar, the event featured 32 teams from around the world competing for the most coveted title in international football. The tournament was full of surprises, with teams like Morocco reaching the semifinals and Argentina, led by the legendary Lionel Messi, emerging as the champions. Argentina’s victory was particularly memorable as it marked Messi's first World Cup win, cementing his place as one of the greatest footballers of all time. The final match, where Argentina defeated France in a thrilling penalty shootout after a 3-3 draw, will go down in history as one of the best finals ever played. The 2022 World Cup also introduced innovations such as cutting-edge stadiums with advanced cooling systems and the use of technology to enhance the accuracy of refereeing decisions. The tournament captured the hearts of millions of fans worldwide and showcased the power of football to unite people from different cultures."
+  },
+  {
+    "title": "Metrorail",
+    "text": "Metrorail systems are becoming increasingly popular in cities around the world as a solution to urban traffic congestion and pollution. The introduction of a metrorail system in a city can greatly improve public transportation, providing a fast, efficient, and environmentally friendly way to travel. In many cities, metrorail systems are modernizing public transport by offering a reliable and safe mode of commuting. These systems are particularly useful in densely populated urban areas where traffic jams are a daily problem. The trains are usually spacious, air-conditioned, and run at regular intervals, making them a convenient choice for commuters. Metrorail systems also contribute to reducing carbon emissions by encouraging people to use public transport instead of private cars. For example, in cities like Dhaka, the introduction of a metrorail system promises to ease traffic congestion, improve mobility, and enhance the overall quality of life for residents. With their efficiency and ability to reduce environmental impact, metrorail systems are an essential part of modern urban infrastructure."
+  },
+  {
+    "title": "School Magazine",
+    "text": "A school magazine is an excellent platform for students to showcase their creativity, ideas, and talents. It serves as a mirror of school life, featuring articles, poems, stories, artwork, and reports on various events and activities. The school magazine provides students with an opportunity to express themselves, share their experiences, and engage with the school community. Every year, the editorial team, made up of students and teachers, works hard to compile content that reflects the spirit of the school. The magazine often includes sections like student interviews, profiles of outstanding achievements, and updates on academic and extracurricular progress. It also acts as a wonderful tool for improving writing and communication skills, as students contribute to its content and design. The final product is always something to look forward to, as it not only captures memories from the school year but also fosters a sense of belonging and pride among the students. A school magazine is more than just a publication; it is a cherished keepsake that brings the school community together."
+  },
+  {
+    "title": "Traffic Jam",
+    "text": "Traffic jams are a common problem in many urban areas, especially during peak hours. These traffic slowdowns occur when too many vehicles are on the road, leading to congestion, delays, and frustration for commuters. The main causes of traffic jams include insufficient infrastructure, road construction, accidents, and the sheer volume of vehicles on the road. In some cities, traffic jams can last for hours, making daily commutes stressful and time-consuming. Not only do they lead to wasted time, but they also contribute to air pollution and increased fuel consumption. Solutions to traffic jams include improving public transportation, expanding road networks, promoting carpooling, and encouraging the use of alternative transportation like bicycles. While it may take time to fully address the issue, tackling traffic congestion requires a combination of infrastructure development, policy changes, and increased public awareness. Ultimately, reducing traffic jams can lead to a smoother, more efficient commute and a healthier environment for everyone."
+  },
+  {
+    "title": "Moonlit Night",
+    "text": "A moonlit night is one of nature’s most enchanting sights. The full moon shines brightly in the sky, casting a soft, silvery glow over the landscape. The cool breeze rustles through the trees, and the night feels calm and serene. The moonlight reflects off lakes and rivers, creating shimmering trails of light that add to the beauty of the night. On a moonlit night, the world seems peaceful and quiet, with the only sounds being the gentle rustling of leaves or distant animal calls. It’s a perfect time for reflection, a quiet walk under the stars, or simply sitting outside and appreciating the beauty of nature. The moonlit night has a magical quality, making everything look more mystical and captivating, inviting those who are awake to experience the stillness and wonder of the world at night."
+  },
+  {
+    "title": "Village Market",
+    "text": "The village market is a lively and vibrant place where people come together to buy and sell a variety of goods. Early in the morning, the market begins to buzz with activity as vendors set up their stalls, displaying fresh vegetables, fruits, spices, and local handicrafts. The smell of fresh produce fills the air, and the chatter of sellers calling out their prices and customers bargaining for the best deals creates a lively atmosphere. The market is not only a place to shop, but also a social gathering point where villagers meet, chat, and exchange news. You can often find people sharing stories, gossiping, or simply catching up with friends. The market is an important part of village life, providing a sense of community and a source of income for many. It’s a place where one can find both necessities and unique local items, all while experiencing the warmth and hospitality of the village people."
+  },
+  {
+    "title": "Bus Stand",
+    "text": "A bus stand is a hub of activity, where passengers wait for their buses to take them to different destinations. It is often a busy place, with people coming and going at all hours of the day. The air is filled with the sound of announcements, bus engines starting up, and the murmur of people talking or waiting for their turn to board. The bus stand is usually crowded, especially during rush hours, with people standing in line, holding tickets, or checking schedules. It is also a place where various food vendors set up small stalls, offering snacks and refreshments to travelers. While waiting, passengers can observe the diversity of people passing by—each with their own journey and story. The bus stand is not only a point of departure but also a place where different lives intersect for a brief moment. Despite the hustle and bustle, it is a place that serves as a crucial part of daily commuting, connecting people to their destinations."
+  },
+  {
+    "title": "Railway Station",
+    "text": "The railway station is a bustling, vibrant place where people come to catch trains that will take them to various parts of the country. The platform is usually full of activity, with passengers waiting for their trains, checking their tickets, and adjusting their bags. The sound of trains arriving and departing, the clatter of wheels on tracks, and the occasional announcement over the loudspeaker add to the unique atmosphere of the station. The station is often lined with shops selling snacks, drinks, and newspapers, providing last-minute essentials for travelers. Travelers of all types—commuters, tourists, and families—pass through the station, each with their own stories and destinations. The railway station is more than just a place for transportation; it is a symbol of movement, connecting people to their homes, jobs, or adventures. Despite the fast-paced environment, there is a sense of anticipation in the air, as everyone is on their way to somewhere important."
+  },
+  {
+    "title": "21st February Book Fair",
+    "text": "The 21st February Book Fair is a significant cultural event in Bangladesh, held annually to commemorate International Mother Language Day and promote the love of reading and literature. The fair typically takes place at the Bangla Academy and other nearby venues in Dhaka, attracting book lovers, writers, publishers, and students from all over the country. During the fair, a wide range of books in various genres, including fiction, non-fiction, poetry, history, and academic books, are displayed for sale. It’s a vibrant and colorful event, where people can engage in discussions with authors, participate in book signings, and attend literary workshops. The fair not only honors the sacrifices made by language martyrs but also provides a platform for local writers and poets to showcase their work. The 21st February Book Fair is an important cultural event that celebrates the Bengali language and literature, while fostering a deep appreciation for reading among the younger generation."
+  },
+  {
+    "title": "Loadshedding",
+    "text": "Loadshedding, or scheduled power cuts, is a common issue in many countries, particularly during times of energy shortage or high demand. It occurs when the electricity supply cannot meet the demand, forcing authorities to cut power in certain areas for a specific period. Loadshedding can be quite inconvenient, disrupting daily routines, work, and even school activities. In many cases, load shedding leads to problems such as food spoilage, difficulty in communication, and decreased productivity. The reasons for load shedding can range from inadequate infrastructure, limited energy resources, to natural disasters that affect power generation. While the government and power companies try to manage the situation by rotating the power cuts, it often causes frustration among the public. To reduce the impact of load shedding, it is important for people to conserve energy, use alternative power sources like generators or solar panels, and support initiatives to improve energy efficiency and infrastructure."
+  },
+  {
+    "title": "Tea Stall",
+    "text": "A tea stall is a common sight in many cities and towns, especially in countries like India and Bangladesh, where tea is a favorite beverage. These small shops or roadside stalls serve as informal gathering spots for people looking to enjoy a hot cup of tea while socializing or relaxing. The aroma of freshly brewed tea fills the air, drawing in passersby who want to take a break from their busy lives. Tea stalls often offer a variety of teas, from traditional black tea to masala chai, along with snacks like biscuits or savory treats. For many, a visit to the tea stall is a daily ritual, where they meet friends, colleagues, or strangers to exchange news and gossip. The simple, yet cozy atmosphere of a tea stall creates a sense of community, making it more than just a place to drink tea but also a space for conversations and connections. The tea stall represents a crucial part of local culture, where people of all walks of life come together to share moments of respite."
+  },
+  {
+    "title": "Tree Plantation",
+    "text": "Tree plantation is an important environmental initiative that helps in combating climate change, promoting biodiversity, and improving the quality of life. Planting trees contributes to cleaner air, as trees absorb carbon dioxide and release oxygen. They also help prevent soil erosion, reduce flooding, and provide habitats for various species of wildlife. In urban areas, trees add beauty to the landscape and offer shade, reducing the effects of heat islands in cities. Tree plantation campaigns are often organized by governments, environmental organizations, schools, and local communities to encourage people to plant and care for trees. These efforts not only enhance the natural surroundings but also raise awareness about the importance of preserving our planet for future generations. By planting more trees, we contribute to a greener, healthier environment and work toward a sustainable future."
+  },
+  {
+    "title": "Digital Bangladesh",
+    "text": "Digital Bangladesh is a vision aimed at transforming the country into a knowledge-based, technology-driven society. The initiative focuses on improving access to information technology (IT) and creating digital infrastructure to enhance government services, education, healthcare, and business. One of the key objectives is to ensure that every citizen, regardless of location or background, can benefit from digital advancements. The Digital Bangladesh vision includes the widespread use of the internet, digital banking, e-government services, and the promotion of tech innovation and entrepreneurship. Over the years, significant progress has been made in increasing internet penetration, expanding digital education, and providing online services to the public. The goal is not only to modernize the country but also to build a more inclusive society where technology plays a central role in improving the lives of the people and the economy. As more people embrace digital tools, Bangladesh is moving closer to becoming a fully digital society."
+  }
+    ];
+
+    const searchInput = document.getElementById("searchInput");
+    const searchButton = document.getElementById("searchButton");
+    const resultsDiv = document.getElementById("results");
+
+    let selectedComposition = null;
+    let currentDisplayArea = null;
+    let lastClickedDiv = null;
+
+    // Display all compositions initially
+    function displayAllCompositions() {
+      resultsDiv.innerHTML = ""; // Clear previous results
+      compositions.forEach(comp => {
+        const div = document.createElement("div");
+        div.className = "result-item";
+        div.textContent = comp.title;
+        div.onclick = () => displayComposition(comp, div);
+        resultsDiv.appendChild(div);
+      });
+    }
+
+    // Search function
+    function searchCompositions() {
+      const query = searchInput.value.toLowerCase();
+      resultsDiv.innerHTML = ""; // Clear previous results
+
+      const filteredCompositions = compositions.filter(comp =>
+        comp.title.toLowerCase().includes(query) || comp.text.toLowerCase().includes(query)
+      );
+
+      if (filteredCompositions.length === 0) {
+        resultsDiv.innerHTML = "<p>No results found.</p>";
+        return;
+      }
+
+      filteredCompositions.forEach(comp => {
+        const div = document.createElement("div");
+        div.className = "result-item";
+        div.textContent = comp.title;
+        div.onclick = () => displayComposition(comp, div);
+        resultsDiv.appendChild(div);
+      });
+    }
+
+    // Display selected composition below the clicked one, or hide if already displayed
+    function displayComposition(comp, clickedDiv) {
+      if (currentDisplayArea && lastClickedDiv === clickedDiv) {
+        // If the clicked paragraph already has a display area, hide it
+        currentDisplayArea.remove();
+        currentDisplayArea = null;
+        lastClickedDiv = null;
+        return;
+      }
+
+      // Remove the previous display area if one exists
+      if (currentDisplayArea) {
+        currentDisplayArea.remove();
+      }
+
+      selectedComposition = comp;
+
+      // Create a new display area
+      const displayArea = document.createElement("div");
+      displayArea.className = "result-item";
+      displayArea.innerHTML = `
+        <h2>${comp.title}</h2>
+        <textarea id="editTextArea" readonly>${comp.text}</textarea>
+        <div id="buttons">
+          <button id="editButton">Edit</button>
+          <button id="resetButton">Reset</button>
+        </div>
+      `;
+
+      const editTextArea = displayArea.querySelector("#editTextArea");
+      const editButton = displayArea.querySelector("#editButton");
+      const resetButton = displayArea.querySelector("#resetButton");
+
+      // Insert the display area below the clicked paragraph
+      clickedDiv.after(displayArea);
+
+      // Store the current display area for future removals
+      currentDisplayArea = displayArea;
+      lastClickedDiv = clickedDiv;
+
+      // Load edited text from localStorage if available
+      const savedText = localStorage.getItem(comp.title);
+      if (savedText) {
+        editTextArea.value = savedText;
+      }
+
+      // Enable editing
+      editButton.addEventListener("click", () => {
+        editTextArea.readOnly = false;
+      });
+
+      // Reset the paragraph back to the original
+      resetButton.addEventListener("click", () => {
+        editTextArea.value = comp.text;
+        localStorage.removeItem(comp.title); // Remove saved version from localStorage
+        editTextArea.readOnly = true;
+      });
+
+      // Save the edited paragraph to localStorage when text changes
+      editTextArea.addEventListener("input", () => {
+        localStorage.setItem(comp.title, editTextArea.value);
+      });
+    }
+
+    // Event listener for search button
+    searchButton.addEventListener("click", searchCompositions);
+
+    // Optional: Enable search on pressing Enter
+    searchInput.addEventListener("keyup", event => {
+      if (event.key === "Enter") {
+        searchCompositions();
+      }
+    });
+
+    // Load all compositions on page load
+    window.onload = displayAllCompositions;
+  </script>
+</body>
+</html>
